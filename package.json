@@ -1,0 +1,21 @@
+{
+  "name": "conf-cli",
+  "version": "1.0.0",
+  "description": "Pull Confluence pages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Moogsoft <stephen@moogsoft.com>",
+  "license": "ISC",
+  "bin": {
+    "conf-cli": "./index.js"
+  },
+  "dependencies": {
+    "co": "^4.6.0",
+    "co-prompt": "^1.0.0",
+    "commander": "^2.9.0",
+    "link": "^0.1.5",
+    "superagent": "^3.3.2"
+  }
+}
