@@ -20,7 +20,7 @@ Command line only.
 The page is a search term use quotes if the page name has spaces.
 optional user and password, leave blank if not required.
 
-The base url is in the form http://confliencehost.tld
+The base url is in the form http://confluencehost.tld
 
 Example:
 
@@ -35,3 +35,7 @@ Download and from the directory with the package.json run.
 `npm install`
 
 Link to a directory on your path if requred, or run localy with ./
+
+##Licence
+
+(c) 2017 Moogsoft Inc. Licence MIT, see LICENCE.
