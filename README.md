@@ -1,3 +1,7 @@
+#conf-cli
+
+##Overview
+
 Small utility to pull a page from Confluence and build a local html with local images.
 
 Only supports .png 
@@ -24,7 +28,7 @@ Example:
  
 Outputs the page html and images in a subdirectory named after the page ID in confluence.
 
-Installation
+##Installation
 
 Download and from the directory with the package.json run.
 
