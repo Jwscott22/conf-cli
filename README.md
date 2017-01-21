@@ -23,3 +23,11 @@ Example:
  `conf-cli -u myuser -p mypass -h http://docs.myco.com 'conf-cli utility'`
  
 Outputs the page html and images in a subdirectory named after the page ID in confluence.
+
+Installation
+
+Download and from the directory with the package.json run.
+
+`npm install`
+
+Link to a directory on your path if requred, or run localy with ./
