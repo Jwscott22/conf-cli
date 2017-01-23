@@ -7,40 +7,65 @@ var co = require('co');
 var prompt = require('co-prompt');
 var program = require('commander');
 var request = require('superagent');
+var url = require('url');
 
 program
+    .version('1.0.1')
     .arguments('<page>')
-    .option('-u, --user <user>', 'The user to authentiacte as')
-    .option('-p, --password <password>', 'The user\'s password')
-    .option('-u, --url <host>', 'The base URL for Confluence')
+    .option('-u, --user [user]', 'The user to authentiacte as [optional]')
+    .option('-p, --password [password]', 'The user\'s password [optional]')
+    .option('-U, --url <url>', 'The base URL for Confluence')
     .action(function (page)
     {
         co(function *()
         {
+            if(!program.url) {
+                console.log('No host name provided, please add -U and the base URL for Confluence.');
+                return;
+            }
+            var urlObj = url.parse(program.url);
             var options = {};
             options.user = program.user;
             options.password = '';
             if (options.user) {
                 options.password = program.password || (yield prompt.password('Password:'));
+                urlObj.auth = options.user+':'+options.password;
             }
-            options.host = program.host || 'http://localhost/';
+            options.host = url.format(urlObj);
             options.page = page.replace(' ', '+');
-            options.url = options.host + '/rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view';
+            options.fileName = page.replace(' ', '_');
+            options.url = options.host + 'rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view';
 
+            console.log('Looking up page: '+program.url + 'rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view');
             request
                 .get(options.url)
                 .set('Accept', 'application/json')
-                .auth(options.user, options.password)
+                //.auth(options.user, options.password)
                 .end(function getPage(err, res)
                 {
-                    //console.log(res);
-                    var pageId = res.body.results[0].id;
-                    if (!fs.existsSync('./' + pageId)) {
-                        fs.mkdirSync('./' + pageId);
+                    //console.log(err);
+                    if (err && err.code) {
+                        console.log(err.toString());
+                    }
+                    if (res && res.body && res.body.results && res.body.results[0]) {
+                        var pageId = res.body.results[0].id;
+                    } else if (res && res.statusCode !== 200) {
+                        if (res) {
+                            console.log(res.statusCode + ': '+err);
+                        }
+                        return;
+                    } else {
+                        console.log('Error: no page returned.');
+                        console.log('URL: '+options.url);
+                        //console.log(res);
+                        return;
+                    }
+                    if (!fs.existsSync('./' + options.fileName)) {
+                        fs.mkdirSync('./' + options.fileName);
                     }
                     var view = res.body.results[0].body.view.value;
-                    buildPage(view, pageId);
-                    console.log('Building page in: ' + pageId);
+                    buildPage(options, view);
+                    console.log('Building page in: ' + options.fileName);
                     getImages(options, pageId);
                 });
         });
@@ -49,34 +74,37 @@ program
 
 function getImages(options, pageId)
 {
-    var url = options.host + '/rest/api/content/' + pageId + '/child/attachment';
+    var url = options.host + 'rest/api/content/' + pageId + '/child/attachment';
     var imgIdx = 0;
     //console.log(options.host);
     request
         .get(url)
         .set('Accept', 'application/json')
-        .auth(options.user, options.password)
+        //.auth(options.user, options.password)
         .end(function images(err, res)
         {
-            res.body.results.forEach(function (imageEntry)
+            if (res.body && res.body.results)
             {
-                //console.log(imageEntry._links.download);
-                downloadImg(options, pageId, imageEntry._links.download);
-            })
-        })
+                res.body.results.forEach(function (imageEntry)
+                {
+                    //console.log(imageEntry._links.download);
+                    downloadImg(options, imageEntry._links.download);
+                });
+            }
+        });
 }
 
-function downloadImg(options, pageId, imageFile)
+function downloadImg(options, imageFile)
 {
     //console.log('Download '+options.host+imageFile);
     var imgName = String(imageFile.match(/[^\/]+?\.png\?/ig)[0]).replace(/\?$/m, '').replace(/%20/g, '_');
     //console.log(imgName);
-    var imgFile = fs.createWriteStream('./' + pageId + '/' + imgName);
-    var req = request(options.host + imageFile).accept('png').auth(options.user, options.password);
+    var imgFile = fs.createWriteStream('./' + options.fileName + '/' + imgName);
+    var req = request(options.host + imageFile).accept('png');
     req.pipe(imgFile);
 }
 
-function buildPage(pageHtml, pageId)
+function buildPage(options, pageHtml)
 {
     var reSp = /<span class="confluence-embedded-file-wrapper[\s\S]+?[\s\S]+?<\/span>?/g;
     var reWH = /(height|width)\S+/ig;
@@ -87,11 +115,14 @@ function buildPage(pageHtml, pageId)
     spans.forEach(function (span)
     {
         hw = span.match(reWH);
-        imagename = String(span.match(/[^\/]+?\.png\?/ig)[0]).replace(/\?$/m, '').replace(/%20/g, '_');
-        img = '<img ' + hw[0] + ' ' + hw[1] + ' src="' + imagename + '">';
-        pageHtml = pageHtml.replace(span, img);
-        //console.log(String(span) + ' <-> '+img);
+        if (hw)
+        {
+            imagename = String(span.match(/[^\/]+?\.png\?/ig)[0]).replace(/\?$/m, '').replace(/%20/g, '_');
+            img = '<img ' + hw[0] + ' ' + hw[1] + ' src="' + imagename + '">';
+            pageHtml = pageHtml.replace(span, img);
+            //console.log(String(span) + ' <-> '+img);
+        }
     });
     //console.log('**HTML '+pageHtml);
-    fs.writeFileSync('./' + pageId + '/' + pageId + '.html', pageHtml);
+    fs.writeFileSync('./' + options.fileName + '/' + options.fileName + '.html', pageHtml);
 }

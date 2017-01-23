@@ -13,9 +13,10 @@ Command line only.
   Options:
 
     -h, --help                 output usage information
-    -u, --user <user>          The user to authentiacte as
-    -p, --password <password>  The user's password
-    -u, --url <host>           The base URL for Confluence
+    -V, --version              output the version number
+    -u, --user [user]          The user to authentiacte as [optional]
+    -p, --password [password]  The user's password [optional]
+    -U, --url <url>            The base URL for Confluence
 
 The page is a search term use quotes if the page name has spaces.
 optional user and password, leave blank if not required.
