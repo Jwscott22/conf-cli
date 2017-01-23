@@ -28,6 +28,7 @@ program
             options.user = program.user;
             options.password = '';
             if (options.user) {
+                //noinspection JSUnresolvedVariable,JSAnnotator
                 options.password = program.password || (yield prompt.password('Password:'));
                 urlObj.auth = options.user+':'+options.password;
             }
@@ -35,7 +36,7 @@ program
             options.page = page.replace(' ', '+');
             options.fileName = page.replace(' ', '_');
             options.url = options.host + 'rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view';
-
+            //noinspection JSUnresolvedVariable
             console.log('Looking up page: '+program.url + 'rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view');
             request
                 .get(options.url)
@@ -72,10 +73,14 @@ program
     })
     .parse(process.argv);
 
+/**
+ * Pull the list of images in a page
+ * @param options [object] - An options object with url etc.
+ * @param pageId [string] - The page ID from Confluence
+ */
 function getImages(options, pageId)
 {
     var url = options.host + 'rest/api/content/' + pageId + '/child/attachment';
-    var imgIdx = 0;
     //console.log(options.host);
     request
         .get(url)
@@ -94,6 +99,12 @@ function getImages(options, pageId)
         });
 }
 
+
+/**
+ * Download the png images from a page
+ * @param options [object] - An options object with url etc.
+ * @param imageFile [string] - The filename to use in the downlaod and save
+ */
 function downloadImg(options, imageFile)
 {
     //console.log('Download '+options.host+imageFile);
@@ -104,12 +115,19 @@ function downloadImg(options, imageFile)
     req.pipe(imgFile);
 }
 
+
+/**
+ * Build the page html and update the images with the correct path
+ * @param options [object] - An options object with url etc.
+ * @param pageHtml [string] - The original page html
+ */
 function buildPage(options, pageHtml)
 {
     var reSp = /<span class="confluence-embedded-file-wrapper[\s\S]+?[\s\S]+?<\/span>?/g;
     var reWH = /(height|width)\S+/ig;
     var spans = pageHtml.match(reSp);
     var hw;
+    var imagename;
     var img;
 
     spans.forEach(function (span)
