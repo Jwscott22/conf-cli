@@ -19,7 +19,8 @@ program
     {
         co(function *()
         {
-            if(!program.url) {
+            if (!program.url)
+            {
                 console.log('No host name provided, please add -U and the base URL for Confluence.');
                 return;
             }
@@ -27,17 +28,18 @@ program
             var options = {};
             options.user = program.user;
             options.password = '';
-            if (options.user) {
+            if (options.user)
+            {
                 //noinspection JSUnresolvedVariable,JSAnnotator
                 options.password = program.password || (yield prompt.password('Password:'));
-                urlObj.auth = options.user+':'+options.password;
+                urlObj.auth = options.user + ':' + options.password;
             }
             options.host = url.format(urlObj);
             options.page = page.replace(' ', '+');
             options.fileName = page.replace(' ', '_');
             options.url = options.host + 'rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view';
             //noinspection JSUnresolvedVariable
-            console.log('Looking up page: '+program.url + 'rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view');
+            console.log('Looking up page: ' + program.url + '/rest/api/content/search?cql=(title=%27' + options.page + '%27)&expand=body.view');
             request
                 .get(options.url)
                 .set('Accept', 'application/json')
@@ -45,23 +47,29 @@ program
                 .end(function getPage(err, res)
                 {
                     //console.log(err);
-                    if (err && err.code) {
+                    if (err && err.code)
+                    {
                         console.log(err.toString());
                     }
-                    if (res && res.body && res.body.results && res.body.results[0]) {
+                    if (res && res.body && res.body.results && res.body.results[0])
+                    {
                         var pageId = res.body.results[0].id;
-                    } else if (res && res.statusCode !== 200) {
-                        if (res) {
-                            console.log(res.statusCode + ': '+err);
+                    } else if (res && res.statusCode !== 200)
+                    {
+                        if (res)
+                        {
+                            console.log(res.statusCode + ': ' + err);
                         }
                         return;
-                    } else {
+                    } else
+                    {
                         console.log('Error: no page returned.');
-                        console.log('URL: '+options.url);
+                        console.log('URL: ' + options.url);
                         //console.log(res);
                         return;
                     }
-                    if (!fs.existsSync('./' + options.fileName)) {
+                    if (!fs.existsSync('./' + options.fileName))
+                    {
                         fs.mkdirSync('./' + options.fileName);
                     }
                     var view = res.body.results[0].body.view.value;
@@ -125,6 +133,8 @@ function buildPage(options, pageHtml)
 {
     var reSp = /<span class="confluence-embedded-file-wrapper[\s\S]+?[\s\S]+?<\/span>?/g;
     var reWH = /(height|width)\S+/ig;
+    var reScrS = /<script[\S\s]+?CDATA\[/ig;
+    var reScrE = /\]\]><\/script>/ig;
     var spans = pageHtml.match(reSp);
     var hw;
     var imagename;
@@ -138,6 +148,8 @@ function buildPage(options, pageHtml)
             imagename = String(span.match(/[^\/]+?\.png\?/ig)[0]).replace(/\?$/m, '').replace(/%20/g, '_');
             img = '<img ' + hw[0] + ' ' + hw[1] + ' src="' + imagename + '">';
             pageHtml = pageHtml.replace(span, img);
+            pageHtml = pageHtml.replace(reScrS,'<pre>');
+            pageHtml = pageHtml.replace(reScrE, '</pre>');
             //console.log(String(span) + ' <-> '+img);
         }
     });
