@@ -16,6 +16,7 @@ Command line only.
     -V, --version              output the version number
     -u, --user [user]          The user to authentiacte as [optional]
     -p, --password [password]  The user's password [optional]
+    -s, --space [space]        The space to search
     -U, --url <url>            The base URL for Confluence
 
 The page is a search term use quotes if the page name has spaces.
