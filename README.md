@@ -34,7 +34,8 @@ Outputs the page html and images in a subdirectory named after the page ID in co
 
 Download and from the directory with the package.json run.
 
-`npm install`
+    npm install
+    npm link
 
 Link to a directory on your path if requred, or run localy with ./
 
