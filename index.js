@@ -111,7 +111,7 @@ function getFile(options, fileName)
 {
     var url = options.host + '/rest/api/content/' + options.pageId + '/child/attachment';
     url = url + '?filename=' + fileName.replace(/\?$/m, '');
-    console.log('File URL:' + url);
+    //console.log('File URL:' + url);
 
     request
         .get(url)
