@@ -109,8 +109,11 @@ program
  */
 function getFile(options, fileName)
 {
-    var url = options.host + '/rest/api/content/' + options.pageId + '/child/attachment';
+    var url;
+
+    url = options.host + '/rest/api/content/' + options.pageId + '/child/attachment';
     url = url + '?filename=' + fileName.replace(/\?$/m, '');
+
     //console.log('File URL:' + url);
 
     request
@@ -123,7 +126,6 @@ function getFile(options, fileName)
                 //console.log(res.body.results);
                 res.body.results.forEach(function (fileEntry)
                 {
-                    console.log('Download file:' + fileEntry._links.download);
                     downloadFile(options, fileEntry._links.download);
                 });
             }
@@ -147,6 +149,8 @@ function downloadFile(options, fileName)
     var fileExt;
     var theFile;
     var req;
+
+    console.log('Download file:' + fileName);
 
     //console.log('Download '+options.host+fileName);
     if (fileName.match(/[^\/]+?\.\w+\?/i))
@@ -258,7 +262,10 @@ function buildPage(options, pageHtml)
         hrefs.forEach(function (href)
         {
             fileName = String(href.match(/[^\/]+?\.\w+\?/i));
-            getFile(options, fileName);
+            filePath = href.match(/href=\"([\S\s]*?)\"/im);
+            //console.log('HREF File: %s',filePath[1]);
+            downloadFile(options, filePath[1]);
+
             fileName = cleanFileName(fileName);
 
             fileExt = String(fileName.match(/\.\w+$/im)).toLowerCase();
