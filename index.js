@@ -12,7 +12,7 @@ var util = require('util');
 var jsdom = require('jsdom');
 
 program
-    .version('1.0.2')
+    .version('1.0.3')
     .arguments('<page>')
     .option('-u, --user [user]', 'The user to authentiacte as [optional]')
     .option('-p, --password [password]', 'The user\'s password [optional]')
@@ -216,6 +216,7 @@ function buildPage(options, pageHtml)
     var reSp = /<span class="confluence-embedded-file-wrapper[\s\S]+?[\s\S]+?<\/span>?/g;
     var reHref = /<a href=\"\/download\/attachments[\s\S]+?\>/g;
     var reWH = /(height|width)\S+/ig;
+    var reImg = /\<img/ig;
     var spans = pageHtml.match(reSp);
     var hrefs = pageHtml.match(reHref);
     var hw;
@@ -227,9 +228,15 @@ function buildPage(options, pageHtml)
         spans.forEach(function (span)
         {
             hw = span.match(reWH);
-            if (hw)
+            img = span.match(reImg);
+            //console.log('IMG Span? %s',img);
+            if (img)
             {
+                hw = hw ? hw : ['',''];
+                hw[1] = hw[1] ? hw[1] : '';
                 fileName = String(span.match(/[^\/]+?\.\w+\?/i));
+                //console.log('File: %s', fileName);
+
                 getFile(options, fileName);
                 fileName = cleanFileName(fileName);
 
@@ -238,6 +245,7 @@ function buildPage(options, pageHtml)
                 if (fileExt === '.png' || fileExt === '.jpg')
                 {
                     tag = '<img ' + hw[0] + ' ' + hw[1] + ' src="./images/' + fileName + '">';
+                    //console.log('Tag: %s', tag);
                     pageHtml = pageHtml.replace(span, tag);
                 }
 
