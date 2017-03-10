@@ -12,7 +12,7 @@ var util = require('util');
 var jsdom = require('jsdom');
 
 program
-    .version('1.0.3')
+    .version('1.0.4')
     .arguments('<page>')
     .option('-u, --user [user]', 'The user to authentiacte as [optional]')
     .option('-p, --password [password]', 'The user\'s password [optional]')
@@ -194,7 +194,7 @@ function downloadFile(options, fileName)
 function cleanHTML(html)
 {
     var reScrS = /<script[\S\s]+?CDATA\[/ig;
-    var reScrE = /\]\]><\/script>/ig;
+    var reScrE = /]]><\/script>/ig;
     // First some basic cleaning
 
     html = html.replace("On this page:", "");
@@ -218,13 +218,13 @@ function cleanHTML(html)
 function buildPage(options, pageHtml)
 {
     var reSp = /<span class="confluence-embedded-file-wrapper[\s\S]+?[\s\S]+?<\/span>?/g;
-    var reHref = /<a href=\"\/download\/attachments[\s\S]+?\>/g;
+    var reHref = /<a href="\/download\/attachments[\s\S]+?>/g;
     var reWH = /(height|width)\S+/ig;
-    var reImg = /\<img/ig;
+    var reImg = /<img/ig;
     var spans = pageHtml.match(reSp);
     var hrefs = pageHtml.match(reHref);
-    var hw;
-    var fileName;
+    var hw, img;
+    var fileName, fileExt, filePath;
     var tag;
 
     if (spans)
@@ -233,15 +233,16 @@ function buildPage(options, pageHtml)
         {
             hw = span.match(reWH);
             img = span.match(reImg);
-            //console.log('IMG Span? %s',img);
+            //console.log('IMG Span? %s',span);
             if (img)
             {
                 hw = hw ? hw : ['',''];
                 hw[1] = hw[1] ? hw[1] : '';
                 fileName = String(span.match(/[^\/]+?\.\w+\?/i));
-                //console.log('File: %s', fileName);
+                filePath = span.match(/src=".*(\/download[\S\s]*?)"/im);
+                //console.log('File: %s', filePath[1]);
 
-                getFile(options, fileName);
+                downloadFile(options, filePath[1]);
                 fileName = cleanFileName(fileName);
 
                 fileExt = String(fileName.match(/\.\w+$/im)).toLowerCase();
@@ -262,7 +263,7 @@ function buildPage(options, pageHtml)
         hrefs.forEach(function (href)
         {
             fileName = String(href.match(/[^\/]+?\.\w+\?/i));
-            filePath = href.match(/href=\"([\S\s]*?)\"/im);
+            filePath = href.match(/href="([\S\s]*?)"/im);
             //console.log('HREF File: %s',filePath[1]);
             downloadFile(options, filePath[1]);
 
