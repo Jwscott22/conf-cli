@@ -17,6 +17,7 @@
     "commander": "^2.9.0",
     "jsdom": "^9.9.1",
     "link": "^0.1.5",
-    "superagent": "^3.3.2"
+    "superagent": "^3.3.2",
+    "xmldom": "^0.1.27"
   }
 }
