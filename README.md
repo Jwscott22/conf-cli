@@ -1,6 +1,6 @@
- #conf-cli
+# conf-cli
 
- ##Overview
+## Overview
 
 Small utility to pull a page from Confluence and build a local html with local images.
 
@@ -30,7 +30,7 @@ Example:
  
 Outputs the page html and images in a subdirectory named after the page ID in confluence.
 
- ##Installation
+## Installation
 
 Download and from the directory with the package.json run.
 
@@ -39,6 +39,6 @@ Download and from the directory with the package.json run.
 
 Link to a directory on your path if requred, or run localy with ./
 
- ##Licence
+## Licence
 
 (c) 2017 Moogsoft Inc. Licence MIT, see LICENCE.
