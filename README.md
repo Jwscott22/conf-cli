@@ -26,7 +26,7 @@ The base url is in the form http://confluencehost.tld
 
 Example:
 
- `conf-cli -u myuser -p mypass -h http://docs.myco.com 'conf-cli utility'`
+ `conf-cli -u myuser -p mypass -U http://docs.myco.com 'conf-cli utility'`
  
 Outputs the page html and images in a subdirectory named after the page ID in confluence.
 
