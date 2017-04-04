@@ -15,7 +15,7 @@ var DOMParser = require('xmldom').DOMParser;
 var XMLSerializer = require('xmldom').XMLSerializer;
 
 program
-  .version('1.0.5')
+  .version('1.0.6')
   .arguments('<page>')
   .option('-u, --user [user]', 'The user to authentiacte as [optional]')
   .option('-p, --password [password]', 'The user\'s password [optional]')
@@ -109,7 +109,7 @@ function cleanFileName(filePath)
 {
   var trueFileName;
   trueFileName = String(filePath.match(/[^\/]+?\.\w+\?/i));
-  trueFileName = trueFileName.replace(/%20/g, '_').replace(/\?$/m, '');
+  trueFileName = trueFileName.replace(/(%20| )/g, '_').replace(/\?$/m, '');
   return trueFileName.replace(/%[\dA-F][\dA-F]/g, '');
 }
 /**
@@ -185,7 +185,7 @@ function cleanHTML(html)
   // 3. Remove style attribute
   // 4. Parse back to HTML
   //
-  // TODO: Make this substitute wrapp class a command line option
+  // TODO: Make this substitute wrap class a command line option
   html = '<div class="moog-confluence-data-wrap">' + html + '</div>';
 
   var parser = new DOMParser();
