@@ -15,7 +15,7 @@ var DOMParser = require('xmldom').DOMParser;
 var XMLSerializer = require('xmldom').XMLSerializer;
 
 program
-  .version('1.0.7')
+  .version('1.0.8')
   .arguments('<page>')
   .option('-u, --user [user]', 'The user to authentiacte as [optional]')
   .option('-p, --password [password]', 'The user\'s password [optional]')
@@ -176,6 +176,15 @@ function cleanHTML(html)
 
   html = html.replace(reScrS, '<pre>');
   html = html.replace(reScrE, '</pre>');
+  html = html.replace(/ {2,20}/g, ' ');
+
+  html = html.replace(/“/g, '"');
+  html = html.replace(/”/g, '"');
+
+  //
+  // Replace weird spaces
+  //
+  html = html.replace(/\ /g, ' ');
 
   //
   // Remove any inlined styles
@@ -215,6 +224,8 @@ function cleanHTML(html)
 
   var xmlSerializer = new XMLSerializer();
   html = xmlSerializer.serializeToString(dom);
+
+  html = html.replace(/[\xC0-\xCF]/g,'');
 
   return html;
 }
