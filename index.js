@@ -15,7 +15,7 @@ var DOMParser = require('xmldom').DOMParser;
 var XMLSerializer = require('xmldom').XMLSerializer;
 
 program
-  .version('1.0.6')
+  .version('1.0.7')
   .arguments('<page>')
   .option('-u, --user [user]', 'The user to authentiacte as [optional]')
   .option('-p, --password [password]', 'The user\'s password [optional]')
@@ -47,7 +47,7 @@ program
       options.host = url.format(urlObj);
       options.page = page.replace(' ', '+');
       options.space = program.space || null;
-      options.fileName = page.replace(' ', '_');
+      options.fileName = page.replace(/ /g, '_');
 
       options.host = options.host.replace(/\/$/m, '');
 
