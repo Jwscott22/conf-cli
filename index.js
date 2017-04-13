@@ -201,6 +201,7 @@ function cleanHTML(html)
     if (root && typeof root.removeAttribute === 'function')
     {
       root.removeAttribute('style');
+      root.removeAttribute('id');
     }
 
     if (root.childNodes)
@@ -208,7 +209,6 @@ function cleanHTML(html)
       for (var i = 0; i < root.childNodes.length; i++)
       {
         fixTree(root.childNodes[i]);
-        root.removeAttribute('id');
       }
     }
   };
