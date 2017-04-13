@@ -15,7 +15,7 @@ var DOMParser = require('xmldom').DOMParser;
 var XMLSerializer = require('xmldom').XMLSerializer;
 
 program
-  .version('1.0.8')
+  .version('1.0.9')
   .arguments('<page>')
   .option('-u, --user [user]', 'The user to authentiacte as [optional]')
   .option('-p, --password [password]', 'The user\'s password [optional]')
@@ -178,14 +178,6 @@ function cleanHTML(html)
   html = html.replace(reScrE, '</pre>');
   html = html.replace(/ {2,20}/g, ' ');
 
-  html = html.replace(/“/g, '"');
-  html = html.replace(/”/g, '"');
-
-  //
-  // Replace weird spaces
-  //
-  html = html.replace(/\ /g, ' ');
-
   //
   // Remove any inlined styles
   //
@@ -216,6 +208,7 @@ function cleanHTML(html)
       for (var i = 0; i < root.childNodes.length; i++)
       {
         fixTree(root.childNodes[i]);
+        root.removeAttribute('id');
       }
     }
   };
@@ -225,7 +218,8 @@ function cleanHTML(html)
   var xmlSerializer = new XMLSerializer();
   html = xmlSerializer.serializeToString(dom);
 
-  html = html.replace(/[\xC0-\xCF]/g,'');
+  // Ensure we force UTF-8
+  html = '<head><meta charset="utf-8" /></head>' + html;
 
   return html;
 }
@@ -291,7 +285,7 @@ function buildPage(options, pageHtml)
 
       fileExt = String(fileName.match(/\.\w+$/im)).toLowerCase();
 
-      tag = '<a href="./files/' + fileName + '">';
+      tag = '<a href="/integratons/' + fileName + '">';
       pageHtml = pageHtml.replace(href, tag);
 
       //console.log(String(href) + ' <-> ' + tag);
