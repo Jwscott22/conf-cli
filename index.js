@@ -177,6 +177,8 @@ function cleanHTML(html)
   html = html.replace(reScrS, '<pre>');
   html = html.replace(reScrE, '</pre>');
   html = html.replace(/ {2,20}/g, ' ');
+  html = html.replace(/“/g, '"');
+  html = html.replace(/”/g, '"');
 
   //
   // Remove any inlined styles
@@ -217,9 +219,6 @@ function cleanHTML(html)
 
   var xmlSerializer = new XMLSerializer();
   html = xmlSerializer.serializeToString(dom);
-
-  // Ensure we force UTF-8
-  html = '<head><meta charset="utf-8" /></head>' + html;
 
   return html;
 }
