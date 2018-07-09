@@ -1,10 +1,8 @@
-# conf-cli
+# Conf-Cli Overview
 
-## Overview
+You can use the `conf-cli` utility to pull a page from Confluence and build a local HTML with local images of Moogsoft AIOps.
 
-Small utility to pull a page from Confluence and build a local html with local images.
-
-Only supports .png 
+**Note** This utility only supports image files in .png format. 
 
 Command line only.
 
